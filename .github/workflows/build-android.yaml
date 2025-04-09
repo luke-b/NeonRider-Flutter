@@ -30,10 +30,11 @@ jobs:
           distribution: 'temurin' # Popular open-source distribution
           java-version: '17'
 
-      # 3. Set up Flutter SDK using the official action's stable major version (v1)
+      # 3. Set up Flutter SDK pinning to a specific commit SHA for the v1 tag.
       #    Crucially, pin to the exact Flutter version your project uses.
       - name: Set up Flutter SDK
-        uses: actions/setup-flutter@v1 # Use the documented stable major version tag
+        # Pin to specific commit SHA for v1 tag (Verify this SHA on GitHub!)
+        uses: actions/setup-flutter@78f3f8840a0e8a7910b1c3816588979a41319fec
         with:
           flutter-version: '3.7.3' # Pin to your specific Flutter version
           cache: true # Enable caching for faster builds (caches pub dependencies etc.)
