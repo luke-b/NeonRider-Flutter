@@ -46,6 +46,9 @@ jobs:
         with:
           version: 3.7.3
 
+      - name: Regenerate Platform Files (Android)
+        run: flutter create .
+
       # 4. Install Flutter dependencies
       - name: Install dependencies
         run: flutter pub get
