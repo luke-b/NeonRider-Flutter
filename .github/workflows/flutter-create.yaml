@@ -1,0 +1,61 @@
+# Filename: .github/workflows/generate_platforms.yml
+
+name: Generate Platform Folders (Manual One-Time)
+
+# Allow manual triggering from the Actions tab
+on:
+  workflow_dispatch:
+
+# Grant permissions to write back to the repository
+permissions:
+  contents: write
+
+jobs:
+  generate-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the specific branch you want to modify (usually main)
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main # Make sure this is your target branch
+
+      # 2. Set up the specific Flutter version your project uses
+      - name: Set up Flutter SDK
+        uses: actions/setup-flutter@v1
+        with:
+          flutter-version: '3.7.3' # Your specific Flutter version
+          cache: true
+
+      # 3. Run flutter create . to generate missing platform folders
+      #    This command is generally idempotent but ensure you want template files if folders exist.
+      - name: Generate Platform Files
+        run: flutter create .
+        # Add error checking in case the name is still wrong (though it shouldn't be now)
+        continue-on-error: false
+
+      # 4. Configure Git user for commit
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions-bot@users.noreply.github.com'
+
+      # 5. Stage changes, commit if any changes exist, and push
+      - name: Commit and Push Platform Files
+        run: |
+          # Add all potentially generated platform folders. Be specific if you prefer.
+          # Common ones: android, ios, linux, macos, web, windows
+          git add android/ ios/ linux/ macos/ web/ windows/ .metadata || echo "No platform folders generated or already present"
+
+          # Check if there are changes staged
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            echo "Changes detected, committing platform files..."
+            git commit -m "ci: Add/update generated platform directories [skip ci]"
+            git push origin main # Make sure 'main' is your target branch
+            echo "Platform files pushed."
+          fi
+        # Use continue-on-error cautiously, maybe remove if push must succeed
+        continue-on-error: false # Change to false if push failure should fail the workflow
