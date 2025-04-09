@@ -34,12 +34,17 @@ jobs:
 
       # 3. Set up Flutter SDK using the standard official stable tag (v1)
       #    Pin the exact Flutter version your project requires.
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v1
+      #- name: Set up Flutter
+      #  uses: subosito/flutter-action@v1
+      #  with:
+      #    channel: stable
+      #    flutter-version: 3.7.3
+      #- run: flutter --version
+
+      - name: Install Flutter
+        uses: britannio/action-install-flutter@v1
         with:
-          channel: stable
-          flutter-version: 3.7.3
-      - run: flutter --version
+          version: 3.7.3
 
       # 4. Install Flutter dependencies
       - name: Install dependencies
