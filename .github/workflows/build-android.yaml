@@ -16,74 +16,57 @@ on:
 jobs:
   # This job builds the Android APK
   build-android:
-    # *** CHANGE: Explicitly use Ubuntu 22.04 LTS to rule out ubuntu-24.04 specific issues ***
-    runs-on: ubuntu-22.04
+    # Use the standard latest stable Ubuntu runner
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # 1. Checks-out your repository under $GITHUB_WORKSPACE using the current major version (v4)
+      # 1. Checkout code using current major version
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Set up JDK 17, recommended for modern Android builds, using the current major version (v4)
+      # 2. Set up JDK 17 using current major version
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin' # Popular open-source distribution
+          distribution: 'temurin'
           java-version: '17'
 
-      # 3. Set up Flutter SDK using the official action's stable major version tag (v1)
-      #    Crucially, pin to the exact Flutter version your project uses.
+      # 3. Set up Flutter SDK using the standard official stable tag (v1)
+      #    Pin the exact Flutter version your project requires.
       - name: Set up Flutter SDK
-        uses: actions/setup-flutter@v1 # Reverted back to standard v1 tag
+        uses: actions/setup-flutter@v1 # Standard stable tag
         with:
-          flutter-version: '3.7.3' # Pin to your specific Flutter version
-          cache: true # Enable caching for faster builds (caches pub dependencies etc.)
+          flutter-version: '3.7.3' # Your specific Flutter version
+          cache: true # Recommended for performance
 
-      # 4. Install Flutter dependencies listed in pubspec.yaml
+      # 4. Install Flutter dependencies
       - name: Install dependencies
         run: flutter pub get
 
       # --- Optional Steps (Uncomment to enable) ---
-      # Good practice to ensure code quality before building
-
       # # 5. Check Formatting
       # - name: Check Formatting
       #   run: flutter format --set-exit-if-changed .
-
       # # 6. Run Analyzer
       # - name: Run Analyzer
       #   run: flutter analyze
-
       # # 7. Run Tests
       # - name: Run Tests
       #   run: flutter test
       # --- End Optional Steps ---
 
-      # 8. Build the Android APK in release mode
-      #    Note: This creates an UNSIGNED release APK. Signing requires additional setup with secrets.
+      # 8. Build the Android APK in release mode (unsigned)
       - name: Build APK
         run: flutter build apk --release
 
-      # 9. Upload the generated APK file as a build artifact using the current major version (v4)
-      #    The artifact will be named 'release-apk.zip' and contain the app-release.apk file.
+      # 9. Upload the generated APK artifact using current major version
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error # Fail the step if the APK is not found
+          if-no-files-found: error # Fail if APK is missing
 
-      # --- Optional: Build App Bundle (AAB) instead of APK ---
-      # If you target the Google Play Store, you need an AAB.
-      # Comment out the 'Build APK' and 'Upload APK Artifact' steps above and uncomment these:
-
-      # - name: Build AAB
-      #   run: flutter build appbundle --release
-      #
-      # - name: Upload AAB Artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: release-aab
-      #     path: build/app/outputs/bundle/release/app-release.aab
-      #     if-no-files-found: error # Fail the step if the AAB is not found
+      # --- Optional: Build App Bundle (AAB) instead ---
+      # ... (AAB steps remain the same) ...
