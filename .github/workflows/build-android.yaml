@@ -1,3 +1,5 @@
+# Filename: .github/workflows/android_build.yml
+
 # Workflow name
 name: Build Android APK
 
@@ -14,8 +16,8 @@ on:
 jobs:
   # This job builds the Android APK
   build-android:
-    # Use the latest stable Ubuntu runner provided by GitHub Actions
-    runs-on: ubuntu-latest
+    # *** CHANGE: Explicitly use Ubuntu 22.04 LTS to rule out ubuntu-24.04 specific issues ***
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -30,11 +32,10 @@ jobs:
           distribution: 'temurin' # Popular open-source distribution
           java-version: '17'
 
-      # 3. Set up Flutter SDK pinning to a specific commit SHA for the v1 tag.
+      # 3. Set up Flutter SDK using the official action's stable major version tag (v1)
       #    Crucially, pin to the exact Flutter version your project uses.
       - name: Set up Flutter SDK
-        # Pin to specific commit SHA for v1 tag (Verify this SHA on GitHub!)
-        uses: actions/setup-flutter@78f3f8840a0e8a7910b1c3816588979a41319fec
+        uses: actions/setup-flutter@v1 # Reverted back to standard v1 tag
         with:
           flutter-version: '3.7.3' # Pin to your specific Flutter version
           cache: true # Enable caching for faster builds (caches pub dependencies etc.)
