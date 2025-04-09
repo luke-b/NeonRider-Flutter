@@ -35,7 +35,7 @@ jobs:
       # 3. Set up Flutter SDK using the standard official stable tag (v1)
       #    Pin the exact Flutter version your project requires.
       - name: Set up Flutter SDK
-        uses: actions/setup-flutter@v4 # Standard stable tag
+        uses: actions/setup-flutter@v3 # Standard stable tag
         with:
           flutter-version: '3.7.3' # Your specific Flutter version
           cache: true # Recommended for performance
