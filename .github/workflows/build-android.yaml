@@ -1,0 +1,80 @@
+# Workflow name
+name: Build Android APK
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events but only for the main branch
+  push:
+    branches: [ main ] # Or 'master' if that's your default branch
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This job builds the Android APK
+  build-android:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest # Use a Linux runner for Android builds
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # 1. Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout code
+        uses: actions/checkout@v4 # Use a specific version (v4 is current as of writing)
+
+      # 2. Set up JDK (Android builds require Java)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # Popular open-source distribution
+          java-version: '17' # Flutter 3.7.x generally works well with JDK 11 or 17
+
+      # 3. Set up Flutter SDK using the version your project uses
+      - name: Set up Flutter SDK
+        uses: actions/setup-flutter@v1 # Official Flutter action
+        with:
+          flutter-version: '3.7.3' # Pin to your specific Flutter version
+          cache: true # Enable caching for faster builds
+
+      # 4. Install Flutter dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 5. Optional: Check formatting (good practice)
+      #- name: Check Formatting
+      #  run: flutter format --set-exit-if-changed .
+
+      # 6. Optional: Run Analyzer (good practice)
+      #- name: Run Analyzer
+      #  run: flutter analyze
+
+      # 7. Optional: Run Tests (good practice)
+      #- name: Run Tests
+      #  run: flutter test
+
+      # 8. Build the Android APK (Release mode)
+      #    Note: This builds an UNSIGNED release APK.
+      #    For Play Store or signed distribution, you'll need to add signing steps using secrets.
+      - name: Build APK
+        run: flutter build apk --release # Use --release for optimized build
+
+      # 9. Upload the generated APK file as a build artifact
+      #    This makes the APK downloadable from the Actions tab in GitHub
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk # Name of the artifact zip file
+          path: build/app/outputs/flutter-apk/app-release.apk # Path to the generated APK
+
+      # --- Optional: Build App Bundle (AAB) instead of APK ---
+      # If you want an AAB (required for Play Store uploads), comment out
+      # the 'Build APK' and 'Upload APK Artifact' steps above and uncomment these:
+      # - name: Build AAB
+      #   run: flutter build appbundle --release
+      #
+      # - name: Upload AAB Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: release-aab
+      #     path: build/app/outputs/bundle/release/app-release.aab
